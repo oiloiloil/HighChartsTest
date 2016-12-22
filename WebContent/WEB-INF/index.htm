@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>High Chart Practice</title>
+	<script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="js/jquery-ui.js"></script>
+	<script src="http://code.highcharts.com/highcharts.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/jquery-ui.css" />
+</head>
+<body>
+<!-- 顯示High Charts -->
+<div id='charts' style="width:300px; height:400px;"></div>
+</body>
+<script>
+	var delayTime = 1000 // 1秒
+	var myPoint;
+
+	$(document).ready(function() {
+		console.log("hello");
+		var count = 1;
+		myPoint = setInterval(function() {
+			$.ajax({
+				url: "getData",
+				dataType: "json",
+				type: "get",
+				data: {
+					count: count
+				},
+				success: function(result) {
+					console.log(result);
+					drawPoint(result);
+				},
+				error: function(msg) {
+					console.log(msg);
+				}
+			});
+			count++;
+		}, delayTime);
+	});
+	
+	var myArr = [];
+	function drawPoint(obj) {
+		myArr.push(obj);
+		console.log(myArr);
+		//$("#charts").highcharts();
+		
+		var myChart = Highcharts.chart('charts', {
+			chart: {
+	            type: 'line'
+	        },
+	        title: {
+	            text: 'Just a line chart'
+	        },
+	        xAxis: {},
+	        yAxis: {},
+	        series: {
+	        	name: '',
+	        	data: myArr
+	        }
+		});
+		
+	}
+</script>
+</html>
