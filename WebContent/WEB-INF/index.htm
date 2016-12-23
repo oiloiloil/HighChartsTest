@@ -6,60 +6,102 @@
 	<script type="text/javascript" src="js/jquery.js"></script>
 	<script type="text/javascript" src="js/jquery-ui.js"></script>
 	<script src="http://code.highcharts.com/highcharts.js"></script>
+	<script src="https://code.highcharts.com/modules/exporting.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/jquery-ui.css" />
 </head>
 <body>
+<input id="start" type="button" value="start"></input>
+<input id="stop" type="button" value="stop"></input>
 <!-- 顯示High Charts -->
-<div id='charts' style="width:300px; height:400px;"></div>
+<div id='charts' style="width:600px; height:600px;"></div>
 </body>
 <script>
 	var delayTime = 1000 // 1秒
-	var myPoint;
+	var drawPointInterval;
+	var count;
+	var data = [];
 
 	$(document).ready(function() {
-		console.log("hello");
-		var count = 1;
-		myPoint = setInterval(function() {
-			$.ajax({
-				url: "getData",
-				dataType: "json",
-				type: "get",
-				data: {
-					count: count
-				},
-				success: function(result) {
-					console.log(result);
-					drawPoint(result);
-				},
-				error: function(msg) {
-					console.log(msg);
-				}
-			});
-			count++;
-		}, delayTime);
+		count = 1;
 	});
 	
-	var myArr = [];
-	function drawPoint(obj) {
-		myArr.push(obj);
-		console.log(myArr);
-		//$("#charts").highcharts();
-		
-		var myChart = Highcharts.chart('charts', {
+	$("#start").click(function() {
+		drawPoint();
+	})
+	
+	$("#stop").click(function() {
+		clearInterval(drawPointInterval);
+	})
+	
+	function drawPoint() {
+		Highcharts.chart('charts', {
 			chart: {
-	            type: 'line'
+	            type: 'scatter',
+	            events: {
+	            	load: function(e) {
+	            		var series = this.series[0];
+	            		addPointData(series);
+	            	}
+	            }
 	        },
 	        title: {
-	            text: 'Just a line chart'
+	        	text: "Graph drawing"
 	        },
-	        xAxis: {},
-	        yAxis: {},
-	        series: {
-	        	name: '',
-	        	data: myArr
-	        }
+	        xAxis: {
+	            gridLineWidth: 0.5
+	        },
+	        yAxis: {
+	            title: {
+	                text: 'Y-value'
+	            },
+	            plotLines: [{
+	                value: 0,
+	                width: 1,
+	                color: '#808080'
+	            }]
+	        },
+	        tooltip: {
+	        	title: {
+	        		text: "Coordinate"
+	        	},
+	            pointFormat: '{point.x} : {point.y}'
+	        },
+	        plotOptions: {
+	        	enabled: true,
+	            series: {
+	            	linewidth: 1,
+	            }
+	        },
+	        series: [{
+	        	name: "sprial",
+	        	data: data,
+	        	lineWidth: 2,
+	        	color: '#ff1aff'
+	        }]
 		});
 		
+		function addPointData(series) {
+			drawPointInterval = setInterval(function() {
+				$.ajax({
+					url: "getData",
+					dataType: "json",
+					type: "get",
+					data: {
+						count: count
+					},
+					success: function(result) {
+						series.addPoint([result.x, result.y]);
+						if(series.data.length > 21) { // 超過20條線(超過21個點)刪除前面的點
+							series.data[0].remove();
+						}
+					},
+					error: function(msg) {
+						console.log(msg);
+					}
+				});
+				count++;
+			}, delayTime);
+		}
 	}
 </script>
 </html>
