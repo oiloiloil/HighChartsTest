@@ -10,28 +10,19 @@
 	<link rel="stylesheet" type="text/css" href="css/jquery-ui.css" />
 </head>
 <body>
-<input id="start" type="button" value="start"></input>
-<input id="stop" type="button" value="stop"></input>
 <!-- 顯示High Charts -->
 <div id='charts' style="width:600px; height:600px;"></div>
 </body>
 <script>
-	var delayTime = 1000 // 1秒
+	var delayTime = 1000; // 1秒
 	var drawPointInterval;
 	var count;
 	var data = [];
 
 	$(document).ready(function() {
 		count = 1;
-	});
-	
-	$("#start").click(function() {
 		drawPoint();
-	})
-	
-	$("#stop").click(function() {
-		clearInterval(drawPointInterval);
-	})
+	});
 	
 	function drawPoint() {
 		Highcharts.chart('charts', {
